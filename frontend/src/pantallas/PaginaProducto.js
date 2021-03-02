@@ -1,34 +1,46 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Row, Col, Image, ListGroup, Button, Card, ListGroupItem  } from 'react-bootstrap'
+import { Row, Col, Image, ListGroup, Button, Card, ListGroupItem } from 'react-bootstrap'
 import Rating from '../componentes/Rating'
-import productos from '../productos'
+import axios from 'axios'
 
 function PaginaProducto({ match }) {
-    const producto = productos.find((p) => p._id == match.params.id)
+    const [producto, setProducto] = useState([])
+
+    useEffect(() => {
+
+        async function fetchProducto() {
+            const { data } = await axios.get(`/api/productos/${match.params.id}`)
+            setProducto(data)
+        }
+
+        fetchProducto()
+
+    }, [])
+
     return (
         <div>
             <Link to='/' className="btn btn-light my-3">Atrás</Link>
             <Row>
                 <Col md={6}>
-                    <Image src={producto.image} alt={producto.name} fluid />
+                    <Image src={producto.imagen} alt={producto.nombre} fluid />
                 </Col>
                 <Col md={3}>
                     <ListGroup variant="flush">
                         <ListGroup.Item>
-                            <h3>{producto.name}</h3>
+                            <h3>{producto.nombre}</h3>
                         </ListGroup.Item>
 
                         <ListGroup.Item>
-                            <Rating value={producto.rating} text={`${producto.numReviews} reviews`} color={'#f8e825'}/>
+                            <Rating value={producto.rating} text={`${producto.numero_reviews} reviews`} color={'#f8e825'} />
                         </ListGroup.Item>
 
                         <ListGroup.Item>
-                            Precio: ${producto.price}
+                            Precio: ${producto.precio}
                         </ListGroup.Item>
 
                         <ListGroup.Item>
-                            Descripción: {producto.description}
+                            Descripción: {producto.descripcion}
                         </ListGroup.Item>
                     </ListGroup>
                 </Col>
@@ -39,7 +51,7 @@ function PaginaProducto({ match }) {
                                 <Row>
                                     <Col>Precio:</Col>
                                     <Col>
-                                        <strong>${producto.price}</strong>
+                                        <strong>${producto.precio}</strong>
                                     </Col>
                                 </Row>
                             </ListGroup.Item>
@@ -48,13 +60,13 @@ function PaginaProducto({ match }) {
                                 <Row>
                                     <Col>Existencia:</Col>
                                     <Col>
-                                        {producto.countInStock > 0 ? 'Disponible' : 'No disponible'}
+                                        {producto.stock > 0 ? 'Disponible' : 'No disponible'}
                                     </Col>
                                 </Row>
                             </ListGroup.Item>
 
                             <ListGroup.Item>
-                                <Button className="btn-block" type='button' disabled={producto.countInStock == 0}>
+                                <Button className="btn-block" type='button' disabled={producto.stock == 0}>
                                     Añadir al carrito
                                 </Button>
                             </ListGroup.Item>
