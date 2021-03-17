@@ -1,33 +1,36 @@
 import React, { useState, useEffect } from 'react'
 import Producto from '../componentes/Producto'
+import Loader from '../componentes/Loader'
+import Mensaje from '../componentes/Mensaje'
 import { Row, Col } from 'react-bootstrap'
-import axios from 'axios'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { listaProductos } from '../actions/productosAction'
 
 function PaginaInicio() {
-    const [productos, setProductos] = useState([])
+    const dispatch = useDispatch()
+
+    const productosLista = useSelector(state => state.producto)
+
+    const { error, loading, productos } = productosLista
 
     useEffect(() => {
-
-        async function fetchProductos() {
-            const { data } = await axios.get('/api/productos')
-            setProductos(data)
-        }
-
-        fetchProductos()
-
+        dispatch(listaProductos())
     }, [])
 
     return (
         <div>
             <h1>Productos nuevos</h1>
-            <Row>
-                {productos.map(producto => (
-                    <Col key={producto._id} sm={12} md={6} lg={4} xl={3}>
-                        <Producto producto={producto} />
-                    </Col>
-                ))}
-            </Row>
+            { loading ? <Loader />
+                : error ? <Mensaje variant='danger'>{error}</Mensaje>
+                    :
+                    <Row>
+                        {productos.map(producto => (
+                            <Col key={producto._id} sm={12} md={6} lg={4} xl={3}>
+                                <Producto producto={producto} />
+                            </Col>
+                        ))}
+                    </Row>
+            }
         </div>
     )
 }
